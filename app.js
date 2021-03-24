@@ -5,11 +5,12 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 require('dotenv').config();
-
+const Swal = require('sweetalert2');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var userAPIRouter = require('./api/user-api');
-
+var sessions = require('express-session');
+var plashs = require('connect-flash');
 var app = express();
 
 //connect db
@@ -27,6 +28,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(sessions({
+    secret: 'secret',
+    cookie: { maxAge: 60000 },
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(plashs());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

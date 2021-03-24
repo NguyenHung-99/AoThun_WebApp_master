@@ -35,18 +35,18 @@
             <div class="card card-4">
                 <div class="card-body">
                     <h2 class="title" style="text-align: center">Registration Form</h2>
-                    <form action="/api/create" method="POST">
+                    <form action="" id="form" method="POST">
                         <div class="row row-space">
                             <div class="col-2">
                                 <div class="input-group">
                                     <label class="label">Name</label>
-                                    <input class="input--style-4" type="text" name="ten">
+                                    <input class="input--style-4" type="text" name="ten" required>
                                 </div>
                             </div>
                             <div class="col-2">
                                 <div class="input-group">
                                     <label class="label">Phone</label>
-                                    <input class="input--style-4" type="text" name="sdt">
+                                    <input class="input--style-4" type="text" name="sdt" required>
                                 </div>
                             </div>
                         </div>
@@ -55,7 +55,7 @@
                                 <div class="input-group">
                                     <label class="label">Birthday</label>
                                     <div class="input-group-icon">
-                                        <input class="input--style-4 js-datepicker" type="datetime" name="ngaySinh">
+                                        <input class="input--style-4 js-datepicker" type="datetime" name="ngaySinh" required readonly>
                                         <i class="zmdi zmdi-calendar-note input-icon js-btn-calendar"></i>
                                     </div>
                                 </div>
@@ -84,26 +84,26 @@
                             </div>
                         </div>
 
-                        <input class="input--style-4" type="text" name="email">
+                        <input class="input--style-4" type="email" name="email" required>
                         <br><br>
 
                         <div class="row row-space">
                             <div class="col-2">
                                 <div class="input-group">
                                     <label class="label">Password</label>
-                                    <input class="input--style-4" type="password" name="password">
+                                    <input class="input--style-4" type="password" id="matKhau" name="matKhau" required>
                                 </div>
                             </div>
                             <div class="col-2">
                                 <div class="input-group">
                                     <label class="label">Confirm Password</label>
-                                    <input class="input--style-4" type="password" name="confirmPassword">
+                                    <input class="input--style-4" type="password" id="confirmMatKhau" name="confirmMatKhau" required>
                                 </div>
                             </div>
 
                         </div>
                         <div class="p-t-15">
-                            <button class="btn btn--radius-2 btn--blue" type="submit">Submit</button>
+                            <button class="btn btn--radius-2 btn--blue" type="submit" onclick="validCheck()">Submit</button>
 
                         </div>
                         <div class="p-t-15">
@@ -125,7 +125,22 @@
 
     <!-- Main JS-->
     <script src="/stylesheets/createuser/global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script>
+    <script>
+        function validCheck() {
+            var matKhau = document.getElementById('matKhau').value;
+            var confirmMatKhau = document.getElementById('confirmMatKhau').value;
 
+            if (matKhau !== confirmMatKhau) {
+                Swal.fire('Mật khẩu của bạn không khớp. Vui lòng thử lại.');
+                document.getElementById('matKhau').value = "";
+                document.getElementById('confirmMatKhau').value = "";
+            } else if (matKhau === confirmMatKhau) {
+                document.getElementById('form').action = "/api/create";
+            }
+        }
+    </script>
 </body>
 
 </html>
