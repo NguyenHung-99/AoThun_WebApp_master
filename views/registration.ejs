@@ -25,16 +25,18 @@
 
     <!-- Main CSS-->
     <link href="/stylesheets/createuser/main.css" rel="stylesheet" media="all">
+    <script type="text/javascript" src="flash/flash-client.js"></script>
 </head>
-<script type="text/javascript" src="flash/flash-client.js"></script>
+
 
 <body>
 
-    <div class="page-wrapper bg-gra-02 p-t-130 p-b-100 font-poppins">
+    <div id="signup_div" class="page-wrapper bg-gra-02 p-t-130 p-b-100 font-poppins">
         <div class="wrapper wrapper--w680">
             <div class="card card-4">
                 <div class="card-body">
                     <h2 class="title" style="text-align: center">Registration Form</h2>
+                    <a href="" id="gosignin"></a>
                     <form action="" id="form" method="POST">
                         <div class="row row-space">
                             <div class="col-2">
@@ -84,7 +86,7 @@
                             </div>
                         </div>
 
-                        <input class="input--style-4" type="email" name="email" required>
+                        <input class="input--style-4" id="email" type="email" name="email" required>
                         <br><br>
 
                         <div class="row row-space">
@@ -103,8 +105,12 @@
 
                         </div>
                         <div class="p-t-15">
-                            <button class="btn btn--radius-2 btn--blue" type="submit" onclick="validCheck()">Submit</button>
-
+                            <div class="row row-space">
+                                <div class="col-2">
+                                    <a href="/api/login" class="btn btn--radius-2 btn--blue" style="text-decoration: none;">Login</a>
+                                </div>
+                                <button class="btn btn--radius-2 btn--blue" type="submit" onclick="validCheck()">Signup</button>
+                            </div>
                         </div>
                         <div class="p-t-15">
                             <label style="color: red;font: bold;"><%= msg %></label>
@@ -136,9 +142,77 @@
                 Swal.fire('Mật khẩu của bạn không khớp. Vui lòng thử lại.');
                 document.getElementById('matKhau').value = "";
                 document.getElementById('confirmMatKhau').value = "";
-            } else if (matKhau === confirmMatKhau) {
+            } else if (matKhau.length < 6) {
+                Swal.fire('Mật khẩu phải có ít nhất 6 ký tự.');
+                document.getElementById('matKhau').value = "";
+                document.getElementById('confirmMatKhau').value = "";
+            } else if (matKhau === confirmMatKhau && matKhau.length >= 6) {
+                //mật khẩu hợp lệ => lưu db & lưu firebase
                 document.getElementById('form').action = "/api/create";
+                create_account();
             }
+        }
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyAOgkN3QMz8wu3dNZGZZicdnMtNRe86GwA",
+            authDomain: "fir-25494.firebaseapp.com",
+            projectId: "fir-25494",
+            storageBucket: "fir-25494.appspot.com",
+            messagingSenderId: "923809567266",
+            appId: "1:923809567266:web:056d04e8117442d1a5307b",
+            measurementId: "G-VPG4GZDMSJ"
+        };
+        firebase.initializeApp(config);
+    </script>
+    <script>
+        //create new account firebase và gửi xác thực về email
+        function create_account() {
+            var userEmail = document.getElementById("email").value;
+            var userPass = document.getElementById("matKhau").value;
+            //tạo tk
+            firebase.auth().createUserWithEmailAndPassword(userEmail, userPass).then(function() {
+                var user = firebase.auth().currentUser;
+                //tạo tk => gửi xác thực đến email bằng function sendEmailVerification()
+                //Nếu gửi email thành công => hiện thông báo success, người dùng nhấp OK để quay lại trang login
+                //gửi thất bại => tb lỗi.
+                user.sendEmailVerification().then(function() {
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success...',
+                        text: 'Gửi xác thực thành công. Vui lòng kiểm tra email',
+                        confirmButtonText: `OK`,
+
+                    }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            firebase.auth().signOut();
+                            document.getElementById('gosignin').href = "/api/login";
+                            document.getElementById('gosignin').click();
+                        }
+                    })
+                }).catch(function(error) {
+                    // An error happened.
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error...',
+                        text: error.message,
+                    });
+                });
+            }).catch(function(error) {
+                //TB lỗi khi tạo tk thất bại
+                // Handle Errors here.
+                var errorCode = error.code;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error...',
+                    text: error.message,
+                });
+                // ...
+            });
         }
     </script>
 </body>

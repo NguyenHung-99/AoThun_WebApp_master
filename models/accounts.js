@@ -1,10 +1,7 @@
 const mongoose = require('mongoose');
 
 const accountSchema = new mongoose.Schema({
-    matKhau: {
-        type: String,
-        require: true,
-    },
+
     phanQuyen: {
         type: String,
 
@@ -13,7 +10,7 @@ const accountSchema = new mongoose.Schema({
     trangThai: {
         type: String,
 
-        default: 'true',
+        default: 'false',
     }
 });
 module.exports = Account = mongoose.model('account', accountSchema);

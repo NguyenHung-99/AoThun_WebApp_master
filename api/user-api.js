@@ -23,9 +23,7 @@ router.post('/create', async(req, res) => {
             //result = null: email này chưa đăng kí trong hệ thống
             else {
                 // Tạo account cho user
-                let accounts = {};
-                accounts.matKhau = req.body.matKhau;
-                let userAccount = new Account(accounts);
+                let userAccount = new Account();
                 await userAccount.save();
                 //Tạo Address mặc định cho user
                 let userAddress = new Address();
@@ -40,13 +38,13 @@ router.post('/create', async(req, res) => {
                 user.diaChi = userAddress.id;
                 let users = new User(user);
                 await users.save();
-                res.render('login', { msg: "Đăng kí thành công!!!" });
+                // res.render('login', { msg: "Đăng kí thành công!!!" });
             }
         })
         .catch(err => res.status(404).json({ msg: 'Sorry! email not found' }));
 });
 //open login form
-router.get('/login', (req, res) => {
+router.get('/login', async(req, res, next) => {
     //sử dụng flash để lấy được msg thông báo từ form login
     res.render('login', { msg: req.flash('msg') });
 })
@@ -55,27 +53,27 @@ router.get('/home', (req, res) => {
     res.render('home', { msg: req.flash('msg') });
 })
 router.post('/confirm', async(req, res) => {
-    User.findOne({ email: req.body.email }).then(async(result) => {
-        if (result) {
-            Account.findById(result.account).then(user => {
-                //password true => login, false thông báo msg
-                if (req.body.matKhau === user.matKhau) {
-                    req.flash('msg', 'login success');
-                    res.redirect('/api/home');
-                    //res.render('home', { msg: "Đăng nhập thành công" });
-                } else {
-                    req.flash('msg', 'Mật khẩu không hợp lệ!! Vui lòng nhập lại mật khẩu!!')
-                    res.redirect('/api/login');
-                }
-            }).catch(err => res.json({
-                msg: err.messege,
-            }))
-        } else {
-            //chưa có tài khoản trong hệ thống
-            req.flash('msg', 'Tài khoản không hợp lệ!! Vui lòng đăng kí tài khoản!!')
-            res.redirect('/api/login');
-        }
-    }).catch(err => res.status(404).json({ msg: 'Sorry! email not found' }));
+    // User.findOne({ email: req.body.email }).then(async(result) => {
+    //     if (result) {
+    //         Account.findById(result.account).then(user => {
+    //             //password true => login, false thông báo msg
+    //             if (req.body.matKhau === user.matKhau) {
+    //                 req.flash('msg', 'login success');
+    //                 res.redirect('/api/home');
+    //                 //res.render('home', { msg: "Đăng nhập thành công" });
+    //             } else {
+    //                 req.flash('msg', 'Mật khẩu không hợp lệ!! Vui lòng nhập lại mật khẩu!!')
+    //                 res.redirect('/api/login');
+    //             }
+    //         }).catch(err => res.json({
+    //             msg: err.messege,
+    //         }))
+    //     } else {
+    //         //chưa có tài khoản trong hệ thống
+    //         req.flash('msg', 'Tài khoản không hợp lệ!! Vui lòng đăng kí tài khoản!!')
+    //         res.redirect('/api/login');
+    //     }
+    // }).catch(err => res.status(404).json({ msg: 'Sorry! email not found' }));
 
 })
 

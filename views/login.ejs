@@ -115,36 +115,82 @@
             font-size: 14px;
         }
     </style>
+    <script type="text/javascript" src="flash/flash-client.js"></script>
 </head>
 
 <body>
+
     <div class="login-form">
-        <form action="/api/confirm" id="form" method="post">
+        <form action="" method="POST" id="formlogin">
             <div class="avatar">
                 <img src="/images/avatar.png" alt="Avatar">
             </div>
             <h2 class="text-center">Login</h2>
             <div class="form-group">
-                <input type="text" class="form-control" name="email" placeholder="Email" required="required">
+                <input type="text" class="form-control" id="email" name="email" placeholder="Email" required>
             </div>
 
             <div class="form-group">
-                <input type="password" class="form-control" name="matKhau" placeholder="Password" required="required">
+                <input type="password" class="form-control" id="matKhau" name="matKhau" placeholder="Password" required>
             </div>
             <div class="form-group">
-                <button type="submit" id="btnSignIn" class="btn btn-primary btn-lg btn-block">Sign in</button>
+                <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="login()">Sign in</button>
             </div>
             <div class="bottom-action clearfix">
                 <label class="float-left form-check-label"><input type="checkbox"> Remember me</label>
                 <a href="#" class="float-right">Forgot Password?</a>
             </div>
             <div class="bottom-action clearfix">
-
                 <label style="align-items: center; color: red;"><%= msg %></label>
+                <a href="" id="helo">gggg</a>
             </div>
         </form>
-        <p class="text-center small">Don't have an account? <a href="/api/signup">Sign up here!</a></p>
+        <p class="text-center small">Don't have an account? <a href="/api/signup" id="signup">Sign up here!</a></p>
+
+
+
     </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyAOgkN3QMz8wu3dNZGZZicdnMtNRe86GwA",
+            authDomain: "fir-25494.firebaseapp.com",
+            projectId: "fir-25494",
+            storageBucket: "fir-25494.appspot.com",
+            messagingSenderId: "923809567266",
+            appId: "1:923809567266:web:056d04e8117442d1a5307b",
+            measurementId: "G-VPG4GZDMSJ"
+        };
+        firebase.initializeApp(config);
+    </script>
+
+    <script>
+        function login() {
+
+            var userEmail = document.getElementById("email").value;
+            var userPass = document.getElementById("matKhau").value;
+            firebase.auth().signInWithEmailAndPassword(userEmail, userPass).then(function(user) {
+                alert(user);
+                document.getElementById('helo').href = "/api/signup";
+                document.getElementById('helo').click();
+            }).catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+
+                window.alert("Error : " + errorMessage);
+
+                // ...
+            });
+
+        }
+    </script>
 
 </body>
 
