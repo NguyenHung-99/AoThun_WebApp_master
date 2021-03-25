@@ -53,6 +53,15 @@ router.get('/home', (req, res) => {
     res.render('home', { msg: req.flash('msg') });
 })
 router.post('/confirm', async(req, res) => {
+    User.findOne({ email: req.body.email }).then((result) => {
+        if (result) {
+            console.log(result);
+        } else {
+            //chưa có tài khoản trong hệ thống
+            req.flash('msg', 'Tài khoản không hợp lệ!! Vui lòng đăng kí tài khoản!!')
+            res.redirect('/api/login');
+        }
+    }).catch(err => res.status(404).json({ msg: 'Sorry! email not found' }));
     // User.findOne({ email: req.body.email }).then(async(result) => {
     //     if (result) {
     //         Account.findById(result.account).then(user => {

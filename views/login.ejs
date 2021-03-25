@@ -4,6 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Colorlib Templates">
+    <meta name="author" content="Colorlib">
+    <meta name="keywords" content="Colorlib Templates">
     <title>Login</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -138,11 +141,10 @@
             </div>
             <div class="bottom-action clearfix">
                 <label class="float-left form-check-label"><input type="checkbox"> Remember me</label>
-                <a href="#" class="float-right">Forgot Password?</a>
+                <a href="#" id="forgotPW" class="float-right">Forgot Password?</a>
             </div>
             <div class="bottom-action clearfix">
                 <label style="align-items: center; color: red;"><%= msg %></label>
-                <a href="" id="helo">gggg</a>
             </div>
         </form>
         <p class="text-center small">Don't have an account? <a href="/api/signup" id="signup">Sign up here!</a></p>
@@ -172,23 +174,68 @@
 
     <script>
         function login() {
-
+            document.getElementById("formlogin").action = "/api/confirm";
             var userEmail = document.getElementById("email").value;
             var userPass = document.getElementById("matKhau").value;
             firebase.auth().signInWithEmailAndPassword(userEmail, userPass).then(function(user) {
-                alert(user);
-                document.getElementById('helo').href = "/api/signup";
-                document.getElementById('helo').click();
+                if (user.emailVerified == true) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success...',
+                        text: 'Đăng nhập thành công',
+                        confirmButtonText: `OK`,
+                    }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+
+                            document.getElementById('forgotPW').href = "/api/login2";
+                            document.getElementById('forgotPW').click();
+                        }
+                    })
+                } else {
+                    //Tài khoản chưa được xác thực
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error...',
+                        text: 'Tài khoản chưa được xác thực',
+                        showCancelButton: true,
+                        confirmButtonText: `Send Email Verification`,
+                    }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                            send_veritified();
+                        }
+                    })
+                }
+
             }).catch(function(error) {
                 // Handle Errors here.
                 var errorCode = error.code;
-                var errorMessage = error.message;
-
-                window.alert("Error : " + errorMessage);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error...',
+                    text: error.message,
+                });
 
                 // ...
             });
 
+        }
+
+        function send_veritified() {
+            var user = firebase.auth().currentUser;
+
+            user.sendEmailVerification().then(function() {
+                // Email sent.
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success...',
+                    text: 'Send Email Verification Success',
+                });
+            }).catch(function(error) {
+                // An error happened.
+                Swal.fire('error' + error.message);
+            });
         }
     </script>
 
